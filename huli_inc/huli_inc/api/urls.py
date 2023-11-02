@@ -29,11 +29,9 @@ urlpatterns = [
          name='user-activation'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path(
-        'users/me/',
-        UserProfileViewSet.as_view({'get': 'retrieve'}),
-        name='user-profile'
-    ),
+    path('users/me/',
+         UserProfileViewSet.as_view({'get': 'retrieve'}),
+         name='user-profile'),
 ]
 
 urlpatterns += router.urls
