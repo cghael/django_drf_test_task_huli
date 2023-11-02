@@ -20,7 +20,7 @@ User = get_user_model()
 class ListCreateUpdateView(mixins.CreateModelMixin,
                            mixins.UpdateModelMixin,
                            mixins.ListModelMixin,
-                           mixins.DestroyModelMixin,
+                           # mixins.DestroyModelMixin,  # TODO del
                            viewsets.GenericViewSet):
     pass
 
