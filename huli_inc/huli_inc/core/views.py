@@ -85,7 +85,6 @@ class UserRegisterView(APIView):
 
 class UserActivationView(APIView):
     def get(self, request, user_id64, token):
-        print(request)
         try:
             user_id = decode_user_id(user_id64)
         except(TypeError, ValueError, OverflowError):
