@@ -1,8 +1,39 @@
 version: '3.8'
 
-service:
+services:
+
+  redis:
+    image: redis:7.0.11-alpine
 
   django:
     container_name: django
     build:
       context: ./huli_inc
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./huli_inc:/urs/src/app/
+    ports:
+      - "8001:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-yg^wih=d90tp+nq=zuwe3+0p)5gfb_&@9s)1s2*r4sobsfi=qx
+      - EMAIL_HOST_USER=djangosmtp36@gmail.com
+      - EMAIL_HOST_PASSWORD=ldeb rhbr hruo weab
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+    depends_on:
+      - redis
+
+  celery:
+    container_name: celery
+    build:
+      context: ./huli_inc
+    volumes:
+      - ./huli_inc:/urs/src/app/
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-yg^wih=d90tp+nq=zuwe3+0p)5gfb_&@9s)1s2*r4sobsfi=qx
+      - EMAIL_HOST_USER=djangosmtp36@gmail.com
+      - EMAIL_HOST_PASSWORD=ldeb rhbr hruo weab
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+    depends_on:
+      - redis
