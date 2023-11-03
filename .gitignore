@@ -1,2 +1,4 @@
-/huli_inc/venv/
+venv/
 .env
+db.sqlite3
+.DS_Store
