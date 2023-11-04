@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
@@ -7,6 +6,7 @@ from rest_framework.views import APIView
 
 from api.permissions import IsAdminOrReadOnly, IsSelf
 from core.serializers import CustomUserSerializer
+from core.tasks import send_confirmation_email
 from core.utils import (
     check_activation_token,
     create_activation_link,
@@ -41,14 +41,14 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UserRegisterView(APIView):
-    def __create_email_confirmation(self, request, user):
-        activation_link = create_activation_link(request, user)
-        email = EmailMessage(
-            f'Confirmation email',
-            f'Confirm your email: {activation_link}',
-            to=[user.email]
-        )
-        return email
+    # def __create_email_confirmation(self, request, user):
+    #     activation_link = create_activation_link(request, user)
+    #     email = EmailMessage(
+    #         f'Confirmation email',
+    #         f'Confirm your email: {activation_link}',
+    #         to=[user.email]
+    #     )
+    #     return email
 
     def __create_user(self, validated_data):
         user = User.objects.create(
@@ -67,20 +67,31 @@ class UserRegisterView(APIView):
         if serializer.is_valid():
             print(serializer.validated_data)
             user = self.__create_user(serializer.validated_data)
-            email = self.__create_email_confirmation(request, user)
-            if email.send():
-                return Response(
-                    {'Please check your email for activate link to confirm '
-                     'and complete the registration.'},
-                    status=status.HTTP_200_OK
-                )
+            activation_link = create_activation_link(request, user)
+            send_confirmation_email.apply_async(
+                args=(user.email, activation_link)
+            )
             return Response(
-                {f'Problem sending confirmation email to {user.email}, '
-                 f'check if you typed it correctly.'},
-                status=status.HTTP_400_BAD_REQUEST
+                {'Please check your email for activate link '
+                 'to confirm and complete the registration.'},
+                status=status.HTTP_200_OK
             )
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
+            # email = self.__create_email_confirmation(request, user)
+            # if email.send():
+            #     return Response(
+            #         {'Please check your email for activate link to confirm '
+            #          'and complete the registration.'},
+            #         status=status.HTTP_200_OK
+            #     )
+            # return Response(
+            #     {f'Problem sending confirmation email to {user.email}, '
+            #      f'check if you typed it correctly.'},
+            #     status=status.HTTP_400_BAD_REQUEST
+            # )
+        # return Response(serializer.errors,
+        #                 status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserActivationView(APIView):
