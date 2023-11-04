@@ -27,6 +27,7 @@ services:
     container_name: celery
     build:
       context: ./huli_inc
+    command: celery --app=huli_inc worker -l INFO
     volumes:
       - ./huli_inc:/urs/src/app/
     environment:
