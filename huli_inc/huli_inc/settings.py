@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
     'rest_framework',
     'rest_framework_simplejwt',
     'core.apps.CoreConfig',
@@ -136,3 +137,4 @@ EMAIL_PORT = 587
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER', 'redis://redis:6379/0')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_BACKEND', 'redis://redis:6379/0')
+CELERY_BEAT_SCHEDULE_FILENAME = 'beat_schedule.py'

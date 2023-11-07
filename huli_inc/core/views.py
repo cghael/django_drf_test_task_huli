@@ -41,15 +41,6 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UserRegisterView(APIView):
-    # def __create_email_confirmation(self, request, user):
-    #     activation_link = create_activation_link(request, user)
-    #     email = EmailMessage(
-    #         f'Confirmation email',
-    #         f'Confirm your email: {activation_link}',
-    #         to=[user.email]
-    #     )
-    #     return email
-
     def __create_user(self, validated_data):
         user = User.objects.create(
             username=validated_data.get('username', ''),
@@ -65,7 +56,6 @@ class UserRegisterView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
-            print(serializer.validated_data)
             user = self.__create_user(serializer.validated_data)
             activation_link = create_activation_link(request, user)
             send_confirmation_email.apply_async(
@@ -78,20 +68,6 @@ class UserRegisterView(APIView):
             )
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
-            # email = self.__create_email_confirmation(request, user)
-            # if email.send():
-            #     return Response(
-            #         {'Please check your email for activate link to confirm '
-            #          'and complete the registration.'},
-            #         status=status.HTTP_200_OK
-            #     )
-            # return Response(
-            #     {f'Problem sending confirmation email to {user.email}, '
-            #      f'check if you typed it correctly.'},
-            #     status=status.HTTP_400_BAD_REQUEST
-            # )
-        # return Response(serializer.errors,
-        #                 status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserActivationView(APIView):
